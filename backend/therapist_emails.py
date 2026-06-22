@@ -19,7 +19,7 @@ is merged on top of the values below.
 THERAPIST_EMAILS = {
     "rich-maier": "rich@parkviewcounseling.org",
     "steph-maier": "steph@parkviewcounseling.org",
-    "cristina-dunahoo": "cristina@parkviewcounseling.org",
+    "cristina-dunahoo": "thecenterforwellbeing26@gmail.com",
     # Add new therapists here, e.g.:
     # "jane-doe": "jane@parkviewcounseling.org",
 }
