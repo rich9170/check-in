@@ -257,11 +257,9 @@ async def list_therapists(refresh: bool = False):
     try:
         result = await asyncio.to_thread(get_therapists, refresh)
     except RuntimeError as e:
-        # No data at all -> kiosk shows "initializing" message.
-        return JSONResponse(
-            status_code=503,
-            content={"code": "NO_DATA", "message": str(e), "therapists": []},
-        )
+        # No data at all -> kiosk shows "initializing" message. Return 200 with an
+        # empty list so the platform gateway doesn't replace a 5xx with its own page.
+        return {"therapists": [], "source": "unavailable", "cached_at": 0, "code": "NO_DATA", "message": str(e)}
     # Never expose emails. Only public fields are returned.
     public = [
         {
@@ -312,7 +310,7 @@ async def checkin(req: CheckinRequest):
         log_failure("EMAIL_SEND_FAILED", str(e), slug=slug)
         await record_event(slug, name, "failed", f"EMAIL_SEND_FAILED: {e}")
         raise HTTPException(
-            status_code=502,
+            status_code=422,
             detail={"code": "EMAIL_SEND_FAILED", "message": "Could not send the notification email."},
         )
 
