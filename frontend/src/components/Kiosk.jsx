@@ -118,7 +118,7 @@ export default function Kiosk() {
   };
 
   return (
-    <div className="kiosk-root relative flex min-h-screen flex-col bg-brand-cream text-brand-ink">
+    <div className="kiosk-root relative flex h-screen flex-col overflow-hidden bg-brand-cream text-brand-ink">
       {screen === "loading" && <LoadingScreen />}
       {screen === "init-error" && <InitErrorScreen onRetry={() => loadTherapists(true)} />}
 
@@ -158,27 +158,30 @@ export default function Kiosk() {
 /* ---------------------- Screens ---------------------- */
 
 function HomeScreen({ therapists, onSelect }) {
+  const count = therapists.length;
+  // Landscape columns scale with roster size so 8 cards still fit one screen.
+  const landscapeCols = count > 6 ? "landscape:grid-cols-4" : "landscape:grid-cols-3";
   return (
     <main
       data-testid={TestIds.homeScreen}
-      className="mx-auto flex w-full max-w-5xl flex-1 flex-col px-6 py-10 sm:px-10 sm:py-14"
+      className="mx-auto flex h-full w-full max-w-6xl flex-col px-6 py-5 sm:px-10 sm:py-7"
     >
-      <header className="mb-10 animate-fade-up">
-        <p className="mb-3 text-sm font-semibold uppercase tracking-[0.32em] text-brand-green">
+      <header className="mb-5 shrink-0 animate-fade-up sm:mb-6">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.32em] text-brand-green sm:text-sm">
           Parkview Counseling
         </p>
-        <h1 className="font-serif text-4xl leading-[1.05] text-brand-ink sm:text-5xl lg:text-6xl">
+        <h1 className="font-serif text-3xl leading-[1.05] text-brand-ink sm:text-4xl lg:text-5xl">
           Welcome to Parkview Counseling
-          <span className="block text-brand-green">— Check In</span>
+          <span className="text-brand-green"> — Check In</span>
         </h1>
-        <p className="mt-4 max-w-xl text-lg text-brand-muted">
+        <p className="mt-2 text-base text-brand-muted sm:text-lg">
           Tap your therapist to let them know you've arrived.
         </p>
       </header>
 
       <div
         data-testid={TestIds.therapistGrid}
-        className="grid grid-cols-2 gap-6 landscape:grid-cols-3 sm:gap-8"
+        className={`grid min-h-0 flex-1 grid-cols-2 gap-4 sm:gap-5 ${landscapeCols} [grid-auto-rows:1fr]`}
       >
         {therapists.map((t, i) => (
           <TherapistCard key={t.slug} therapist={t} onSelect={onSelect} index={i} />
