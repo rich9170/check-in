@@ -201,7 +201,11 @@ function ConfirmModal({ therapist, onConfirm, onCancel }) {
             alt={therapist.name}
             draggable={false}
             referrerPolicy="no-referrer"
-            className="h-full w-full object-cover"
+            className={
+              typeof therapist.photo === "string" && therapist.photo.includes("/images/practices/")
+                ? "h-full w-full bg-white object-contain p-2"
+                : "h-full w-full object-cover"
+            }
           />
         </div>
         <h2 className="font-serif text-3xl leading-tight text-brand-ink">

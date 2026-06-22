@@ -20,6 +20,7 @@ THERAPIST_EMAILS = {
     "rich-maier": "rich@parkviewcounseling.org",
     "steph-maier": "steph@parkviewcounseling.org",
     "cristina-dunahoo": "thecenterforwellbeing26@gmail.com",
+    "shari-almanza": "almanza@therapysolutionsgr.com",
     # Add new therapists here, e.g.:
     # "jane-doe": "jane@parkviewcounseling.org",
 }

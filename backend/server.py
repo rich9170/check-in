@@ -42,6 +42,12 @@ FROM_EMAIL = (os.environ.get("FROM_EMAIL") or os.environ.get("SENDER_EMAIL") or 
 
 EMAIL_SUBJECT = "Client has checked in at Parkview Counseling"
 
+# Fallback headshots for therapists whose site profile has no photo (photo: null).
+# Keyed by slug -> image path/URL (relative paths are resolved against the site).
+PHOTO_FALLBACKS = {
+    "shari-almanza": "/images/practices/almanza-therapy-solutions-mark.webp",
+}
+
 # ---------------------------------------------------------------------------
 # Logging (console + rotating file the practice can review later)
 # ---------------------------------------------------------------------------
@@ -127,6 +133,32 @@ def _scrape_site() -> List[dict]:
         found[slug] = {
             "slug": slug,
             "name": name,
+            "credentials": m.group("credentials").strip(),
+            "title": m.group("title").strip(),
+            "photo": photo if photo.startswith("http") else f"{SITE_BASE}{photo}",
+        }
+
+    # Secondary pass: therapist objects that carry an explicit slug but may have
+    # no headshot (photo: null) — e.g. sub-practice therapists. Use a configured
+    # fallback image when the site has none.
+    slug_pattern = re.compile(
+        r'\{slug:"(?P<slug>[^"]+)",name:"(?P<name>[^"]+)",credentials:"(?P<credentials>[^"]*)",'
+        r'title:"(?P<title>[^"]*)",photo:(?P<photo>null|"[^"]*")'
+    )
+    for m in slug_pattern.finditer(js):
+        slug = m.group("slug").strip()
+        if slug in found:
+            continue
+        raw_photo = m.group("photo")
+        if raw_photo == "null":
+            photo = PHOTO_FALLBACKS.get(slug)
+            if not photo:
+                continue  # no headshot and no fallback configured -> skip
+        else:
+            photo = raw_photo.strip('"')
+        found[slug] = {
+            "slug": slug,
+            "name": m.group("name").strip(),
             "credentials": m.group("credentials").strip(),
             "title": m.group("title").strip(),
             "photo": photo if photo.startswith("http") else f"{SITE_BASE}{photo}",

@@ -2,6 +2,7 @@ import { TestIds } from "../lib/testIds";
 
 export function TherapistCard({ therapist, onSelect, index }) {
   const { slug, name, credentials, photo } = therapist;
+  const isLogo = typeof photo === "string" && photo.includes("/images/practices/");
   return (
     <button
       data-testid={TestIds.card(slug)}
@@ -16,7 +17,11 @@ export function TherapistCard({ therapist, onSelect, index }) {
           draggable={false}
           loading="eager"
           referrerPolicy="no-referrer"
-          className="h-full w-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105"
+          className={
+            isLogo
+              ? "h-full w-full bg-white object-contain p-8 transition-transform duration-500 ease-out group-hover:scale-105"
+              : "h-full w-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105"
+          }
         />
       </div>
       <div className="flex flex-1 flex-col justify-center px-5 py-4">
