@@ -3,6 +3,8 @@ import { TestIds } from "../lib/testIds";
 export function TherapistCard({ therapist, onSelect, index }) {
   const { slug, name, credentials, photo } = therapist;
   const isLogo = typeof photo === "string" && photo.includes("/images/practices/");
+  // Per-therapist framing tweaks (where the crop should focus). Default centers.
+  const objectPosition = { "rich-maier": "center 18%" }[slug] || "center";
   return (
     <button
       data-testid={TestIds.card(slug)}
@@ -17,10 +19,11 @@ export function TherapistCard({ therapist, onSelect, index }) {
           draggable={false}
           loading="eager"
           referrerPolicy="no-referrer"
+          style={isLogo ? undefined : { objectPosition }}
           className={
             isLogo
               ? "h-full w-full bg-white object-contain p-6 transition-transform duration-500 ease-out group-hover:scale-105"
-              : "h-full w-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105"
+              : "h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
           }
         />
       </div>

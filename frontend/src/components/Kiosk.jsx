@@ -204,6 +204,11 @@ function ConfirmModal({ therapist, onConfirm, onCancel }) {
             alt={therapist.name}
             draggable={false}
             referrerPolicy="no-referrer"
+            style={
+              therapist.photo && therapist.photo.includes("/images/practices/")
+                ? undefined
+                : { objectPosition: therapist.slug === "rich-maier" ? "center 18%" : "center" }
+            }
             className={
               typeof therapist.photo === "string" && therapist.photo.includes("/images/practices/")
                 ? "h-full w-full bg-white object-contain p-2"
