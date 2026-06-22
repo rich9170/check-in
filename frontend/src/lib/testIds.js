@@ -1,0 +1,17 @@
+export const TestIds = {
+  homeScreen: "kiosk-home-screen",
+  loadingScreen: "kiosk-loading-screen",
+  initErrorScreen: "kiosk-init-error-screen",
+  retryButton: "kiosk-retry-button",
+  therapistGrid: "therapist-grid",
+  card: (slug) => `therapist-card-${slug}`,
+  confirmModal: "confirm-modal",
+  confirmButton: "confirm-checkin-button",
+  cancelButton: "cancel-checkin-button",
+  sendingScreen: "kiosk-sending-screen",
+  successScreen: "kiosk-success-screen",
+  successHomeButton: "success-home-button",
+  errorScreen: "kiosk-error-screen",
+  errorHomeButton: "error-home-button",
+  refreshCorner: "operator-refresh-corner",
+};
