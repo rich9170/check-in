@@ -4,7 +4,7 @@ export function TherapistCard({ therapist, onSelect, index }) {
   const { slug, name, credentials, photo } = therapist;
   const isLogo = typeof photo === "string" && photo.includes("/images/practices/");
   // Per-therapist framing tweaks (where the crop should focus). Default centers.
-  const objectPosition = { "rich-maier": "center 18%", "cristina-dunahoo": "center 18%" }[slug] || "center";
+  const objectPosition = { "rich-maier": "center 18%", "cristina-dunahoo": "center 18%", "steph-maier": "center 34%" }[slug] || "center";
   return (
     <button
       data-testid={TestIds.card(slug)}
