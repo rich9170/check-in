@@ -55,6 +55,19 @@ export default function Kiosk() {
     };
   }, []);
 
+  // Hide the "Made with Emergent" badge (it has an inline !important style, so it
+  // can only be overridden from JS). Re-hide if it gets re-injected.
+  useEffect(() => {
+    const hideBadge = () => {
+      const el = document.getElementById("emergent-badge");
+      if (el) el.style.setProperty("display", "none", "important");
+    };
+    hideBadge();
+    const obs = new MutationObserver(hideBadge);
+    obs.observe(document.body, { childList: true, subtree: true });
+    return () => obs.disconnect();
+  }, []);
+
   // Activity tracking + inactivity reset for non-home screens
   useEffect(() => {
     const bump = () => (lastActivity.current = Date.now());
