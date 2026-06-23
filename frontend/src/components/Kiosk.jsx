@@ -7,6 +7,7 @@ import { TestIds } from "../lib/testIds";
 const SUCCESS_RETURN_MS = 12000;
 const ERROR_RETURN_MS = 12000;
 const INACTIVITY_MS = 60000;
+const LOGO_URL = "https://www.parkviewcounseling.org/images/logo.png";
 
 export default function Kiosk() {
   const [screen, setScreen] = useState("loading"); // loading | home | init-error | confirm | sending | success | error
@@ -180,9 +181,18 @@ function HomeScreen({ therapists, onSelect }) {
       className="mx-auto flex h-full w-full max-w-6xl flex-col px-6 py-5 sm:px-10 sm:py-7"
     >
       <header className="mb-5 shrink-0 animate-fade-up sm:mb-6">
-        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.32em] text-brand-green sm:text-sm">
-          Parkview Counseling
-        </p>
+        <div className="mb-3 flex items-center gap-3">
+          <img
+            src={LOGO_URL}
+            alt="Parkview Counseling logo"
+            draggable={false}
+            referrerPolicy="no-referrer"
+            className="h-12 w-12 shrink-0 object-contain sm:h-14 sm:w-14"
+          />
+          <p className="text-xs font-semibold uppercase tracking-[0.32em] text-brand-green sm:text-sm">
+            Parkview Counseling
+          </p>
+        </div>
         <h1 className="font-serif text-3xl leading-[1.05] text-brand-ink sm:text-4xl lg:text-5xl">
           Welcome to Parkview Counseling
           <span className="text-brand-green"> — Check In</span>
