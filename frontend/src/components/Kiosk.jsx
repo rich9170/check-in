@@ -207,7 +207,7 @@ function ConfirmModal({ therapist, onConfirm, onCancel }) {
             style={
               therapist.photo && therapist.photo.includes("/images/practices/")
                 ? undefined
-                : { objectPosition: therapist.slug === "rich-maier" ? "center 18%" : "center" }
+                : { objectPosition: { "rich-maier": "center 18%", "cristina-dunahoo": "center 18%" }[therapist.slug] || "center" }
             }
             className={
               typeof therapist.photo === "string" && therapist.photo.includes("/images/practices/")
