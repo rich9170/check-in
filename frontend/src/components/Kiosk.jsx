@@ -230,7 +230,7 @@ function ConfirmModal({ therapist, onConfirm, onCancel }) {
             style={
               therapist.photo && therapist.photo.includes("/images/practices/")
                 ? undefined
-                : { objectPosition: { "rich-maier": "center 18%", "cristina-dunahoo": "center 18%", "steph-maier": "center 34%", "shari-almanza": "center 22%" }[therapist.slug] || "center" }
+                : { objectPosition: { "rich-maier": "center 18%", "cristina-dunahoo": "center 18%", "steph-maier": "center 34%", "shari-almanza": "center 18%" }[therapist.slug] || "center" }
             }
             className={
               typeof therapist.photo === "string" && therapist.photo.includes("/images/practices/")
