@@ -45,7 +45,16 @@ EMAIL_SUBJECT = "Client has checked in at Parkview Counseling"
 # Fallback headshots for therapists whose site profile has no photo (photo: null).
 # Keyed by slug -> image path/URL (relative paths are resolved against the site).
 PHOTO_FALLBACKS = {
-    "shari-almanza": "/images/practices/almanza-therapy-solutions-mark.webp",
+    "shari-almanza": "https://customer-assets.emergentagent.com/job_parkview-intake/artifacts/427fab16_IMG_2619.webp",
+}
+
+# Practice / brand each therapist belongs to. Shown as a small line on their card.
+# Keyed by slug. Edit here to change or add a practice label.
+PRACTICES = {
+    "rich-maier": "Parkview Professional Counseling",
+    "steph-maier": "Parkview Professional Counseling",
+    "cristina-dunahoo": "The CENTER for Wellbeing",
+    "shari-almanza": "Almanza Therapy Solutions",
 }
 
 # ---------------------------------------------------------------------------
@@ -300,6 +309,7 @@ async def list_therapists(refresh: bool = False):
             "credentials": t.get("credentials", ""),
             "title": t.get("title", ""),
             "photo": t["photo"],
+            "practice": PRACTICES.get(t["slug"], ""),
         }
         for t in result["therapists"]
     ]

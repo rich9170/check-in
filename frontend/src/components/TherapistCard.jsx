@@ -1,10 +1,10 @@
 import { TestIds } from "../lib/testIds";
 
 export function TherapistCard({ therapist, onSelect, index }) {
-  const { slug, name, credentials, photo } = therapist;
+  const { slug, name, credentials, practice, photo } = therapist;
   const isLogo = typeof photo === "string" && photo.includes("/images/practices/");
   // Per-therapist framing tweaks (where the crop should focus). Default centers.
-  const objectPosition = { "rich-maier": "center 18%", "cristina-dunahoo": "center 18%", "steph-maier": "center 34%" }[slug] || "center";
+  const objectPosition = { "rich-maier": "center 18%", "cristina-dunahoo": "center 18%", "steph-maier": "center 34%", "shari-almanza": "center 22%" }[slug] || "center";
   return (
     <button
       data-testid={TestIds.card(slug)}
@@ -31,8 +31,13 @@ export function TherapistCard({ therapist, onSelect, index }) {
         <span className="font-serif text-[1.4rem] leading-tight text-brand-ink">
           {name}
         </span>
+        {practice ? (
+          <span className="mt-0.5 text-sm font-medium text-brand-muted">
+            {practice}
+          </span>
+        ) : null}
         {credentials ? (
-          <span className="mt-0.5 text-sm font-medium uppercase tracking-wide text-brand-green">
+          <span className="mt-1 text-xs font-semibold uppercase tracking-wide text-brand-green">
             {credentials}
           </span>
         ) : null}

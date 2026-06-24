@@ -230,7 +230,7 @@ function ConfirmModal({ therapist, onConfirm, onCancel }) {
             style={
               therapist.photo && therapist.photo.includes("/images/practices/")
                 ? undefined
-                : { objectPosition: { "rich-maier": "center 18%", "cristina-dunahoo": "center 18%", "steph-maier": "center 34%" }[therapist.slug] || "center" }
+                : { objectPosition: { "rich-maier": "center 18%", "cristina-dunahoo": "center 18%", "steph-maier": "center 34%", "shari-almanza": "center 22%" }[therapist.slug] || "center" }
             }
             className={
               typeof therapist.photo === "string" && therapist.photo.includes("/images/practices/")
@@ -242,6 +242,9 @@ function ConfirmModal({ therapist, onConfirm, onCancel }) {
         <h2 className="font-serif text-3xl leading-tight text-brand-ink">
           Check in with {therapist.name}?
         </h2>
+        {therapist.practice ? (
+          <p className="mt-2 text-base text-brand-muted">{therapist.practice}</p>
+        ) : null}
         <div className="mt-8 flex flex-col gap-3">
           <button
             data-testid={TestIds.confirmButton}
@@ -327,7 +330,7 @@ function ErrorScreen({ onHome }) {
         Something went wrong.
       </h2>
       <p className="mt-4 max-w-lg text-xl text-brand-muted">
-        Please use your portal to let your therapist know you have arrived.
+        Please send a message to your therapist through TherapyPortal to let them know you've arrived.
       </p>
       <button
         data-testid={TestIds.errorHomeButton}
