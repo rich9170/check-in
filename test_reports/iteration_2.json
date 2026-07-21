@@ -1,0 +1,26 @@
+{
+  "summary": "Verified BUG FIX for PostHog analytics text leaking below the therapist grid, plus regression on home render and Rich Maier check-in flow. On first fetch, the served HTML still had the stray fragment after </html> (dev server was serving a stale copy of index.html since CRA does not hot-reload public/index.html). After `sudo supervisorctl restart frontend`, the served HTML now ends cleanly at </html> (119 lines vs previous 128, single </html>). Body text now contains NO PostHog snippet ('person_profiles', 'identified_only', 'session_recording', 'recordCrossOriginIframes', 'capturePerformance' all absent from document.body.innerText). Regression: header 'Welcome to Parkview Counseling — Check In' visible; grid renders exactly the 6 expected therapists (Rich Maier, Steph Maier, Cristina Dunahoo, Shari M. Almanza, Anna DeVries, Sara Hill); Anna DeVries and Sara Hill render green monogram tiles ('AD' and 'SH') with 0 <img> children; the other four render 1 <img> each. Rich Maier flow: tapping therapist-card-rich-maier opens confirm-modal, clicking confirm-checkin-button transitions to kiosk-success-screen, and success-home-button returns to the home grid.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_2.json"
+  ],
+  "action_items": [
+    "For any future changes to /app/frontend/public/index.html, remember to `sudo supervisorctl restart frontend` since CRA does not hot-reload the HTML template. On first visit before restart, the stale duplicated fragment was still being served and the leak was still visible; after restart the fix is live."
+  ],
+  "critical_code_review_comments": [
+    "Minor: the review request expected data-testid 'therapist-card-shari-m-almanza' but the app uses 'therapist-card-shari-almanza' (the slug drops the 'M.' initial entirely rather than keeping it as '-m-'). Not a functional bug — card renders correctly with photo — but worth aligning slug generation with the source name if tests elsewhere depend on it.",
+    "index.html: consider moving the PostHog init snippet into a separate JS file or a template partial so an editing accident cannot again spill config as text outside the <script> tag."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (frontend-only run)", "frontend": "100%"},
+  "seed_data_creation": "None.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Fix for PostHog text leak in /app/frontend/public/index.html was in place on disk but NOT served until frontend supervisor restart. If you edit index.html, always run `sudo supervisorctl restart frontend` and wait ~10s before validating via curl/browser. Rich Maier is the only slug with an email mapping — use it (not Anna/Sara) for success-flow tests. Backend tests already covered in /app/backend/tests/test_kiosk_api.py from iteration_1.",
+  "rca of the issue": "Root cause: /app/frontend/public/index.html had a duplicated fragment after </html> that rendered PostHog config lines as plain text. E1 removed the stray block so the file ended cleanly at </html>, but the CRA dev server (webpack-dev-server) caches the compiled HTML template and does not pick up public/index.html changes via hot reload. Reproduction: curl the preview URL and count </html> occurrences — before restart there were 2 (line 119 and line 128 with the stray posthog.init snippet between them); after `sudo supervisorctl restart frontend` only 1 </html> at line 119 and no trailing snippet. Mitigation applied: restarted frontend supervisor. Verified via document.body.innerText which no longer contains any PostHog config markers."
+}
