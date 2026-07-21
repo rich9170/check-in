@@ -311,6 +311,14 @@ async def list_therapists(refresh: bool = False):
         [t for t in roster if t["slug"] not in PLACEHOLDER_SLUGS]
         + [t for t in roster if t["slug"] in PLACEHOLDER_SLUGS]
     )
+    # Cache-buster tied to the last scrape time. The site reuses filenames when a
+    # photo changes, so this forces browsers to re-download the latest image.
+    version = int(result["cached_at"])
+
+    def bust(url: str) -> str:
+        sep = "&" if "?" in url else "?"
+        return f"{url}{sep}v={version}"
+
     # Never expose emails. Only public fields are returned.
     public = [
         {
@@ -318,7 +326,7 @@ async def list_therapists(refresh: bool = False):
             "name": t["name"],
             "credentials": t.get("credentials", ""),
             "title": t.get("title", ""),
-            "photo": t["photo"],
+            "photo": bust(t["photo"]),
             "practice": PRACTICES.get(t["slug"], ""),
         }
         for t in ordered
