@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { RefreshCw, CheckCircle2, Loader2 } from "lucide-react";
-import { TherapistCard } from "./TherapistCard";
+import { TherapistCard, getInitials } from "./TherapistCard";
 import { fetchTherapists, postCheckin } from "../lib/kioskApi";
 import { TestIds } from "../lib/testIds";
 
@@ -215,6 +215,8 @@ function HomeScreen({ therapists, onSelect }) {
 }
 
 function ConfirmModal({ therapist, onConfirm, onCancel }) {
+  const [avatarErr, setAvatarErr] = useState(false);
+  const isLogo = therapist.photo && therapist.photo.includes("/images/practices/");
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-brand-ink/55 px-6 backdrop-blur-sm">
       <div
@@ -222,22 +224,27 @@ function ConfirmModal({ therapist, onConfirm, onCancel }) {
         className="w-full max-w-md animate-pop-in rounded-lg border-[1.5px] border-brand-line bg-white p-8 text-center shadow-2xl sm:p-10"
       >
         <div className="mx-auto mb-6 h-24 w-24 overflow-hidden rounded-full border-2 border-brand-green/30">
-          <img
-            src={therapist.photo}
-            alt={therapist.name}
-            draggable={false}
-            referrerPolicy="no-referrer"
-            style={
-              therapist.photo && therapist.photo.includes("/images/practices/")
-                ? undefined
-                : { objectPosition: { "rich-maier": "center 18%", "cristina-dunahoo": "center 18%", "steph-maier": "center 34%", "shari-almanza": "center 18%" }[therapist.slug] || "center" }
-            }
-            className={
-              typeof therapist.photo === "string" && therapist.photo.includes("/images/practices/")
-                ? "h-full w-full bg-white object-contain p-2"
-                : "h-full w-full object-cover"
-            }
-          />
+          {avatarErr || !therapist.photo ? (
+            <div className="flex h-full w-full items-center justify-center bg-brand-green">
+              <span className="font-serif text-3xl font-semibold text-white">
+                {getInitials(therapist.name)}
+              </span>
+            </div>
+          ) : (
+            <img
+              src={therapist.photo}
+              alt={therapist.name}
+              draggable={false}
+              referrerPolicy="no-referrer"
+              onError={() => setAvatarErr(true)}
+              style={
+                isLogo
+                  ? undefined
+                  : { objectPosition: { "rich-maier": "center 18%", "cristina-dunahoo": "center 18%", "steph-maier": "center 34%", "shari-almanza": "center 18%" }[therapist.slug] || "center" }
+              }
+              className={isLogo ? "h-full w-full bg-white object-contain p-2" : "h-full w-full object-cover"}
+            />
+          )}
         </div>
         <h2 className="font-serif text-3xl leading-tight text-brand-ink">
           Check in with {therapist.name}?
