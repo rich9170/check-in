@@ -48,6 +48,10 @@ PHOTO_FALLBACKS = {
     "shari-almanza": "https://customer-assets.emergentagent.com/job_parkview-intake/artifacts/427fab16_IMG_2619.webp",
 }
 
+# Slugs to keep pinned to the BOTTOM of the grid (e.g. placeholders still in
+# development). They still appear; they're just ordered last.
+PLACEHOLDER_SLUGS = ["anna-devries", "sara-hill"]
+
 # Practice / brand each therapist belongs to. Shown as a small line on their card.
 # Keyed by slug. Edit here to change or add a practice label.
 PRACTICES = {
@@ -301,6 +305,12 @@ async def list_therapists(refresh: bool = False):
         # No data at all -> kiosk shows "initializing" message. Return 200 with an
         # empty list so the platform gateway doesn't replace a 5xx with its own page.
         return {"therapists": [], "source": "unavailable", "cached_at": 0, "code": "NO_DATA", "message": str(e)}
+    # Pin placeholder therapists to the bottom, keep others in scraped order.
+    roster = result["therapists"]
+    ordered = (
+        [t for t in roster if t["slug"] not in PLACEHOLDER_SLUGS]
+        + [t for t in roster if t["slug"] in PLACEHOLDER_SLUGS]
+    )
     # Never expose emails. Only public fields are returned.
     public = [
         {
@@ -311,7 +321,7 @@ async def list_therapists(refresh: bool = False):
             "photo": t["photo"],
             "practice": PRACTICES.get(t["slug"], ""),
         }
-        for t in result["therapists"]
+        for t in ordered
     ]
     return {
         "therapists": public,
