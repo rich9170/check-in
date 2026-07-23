@@ -1,0 +1,20 @@
+{
+  "summary": "Frontend-only verification of the practice-label bug fix on the kiosk home screen ('/'). Waited ~5s post networkidle then read innerText of each card via data-testid selectors. Rich Maier card renders ONLY 'Rich Maier' + 'MA, LPC' — no 'Parkview Professional Counseling' and no 'Parkview Counseling' practice line. Steph Maier card renders ONLY 'Steph Maier' + 'LMSW' — no practice line. Regression PASS: Cristina Dunahoo still shows 'The CENTER for Wellbeing' with 'LPC, CAADC, EMDR'; Shari M. Almanza still shows 'Almanza Therapy Solutions' with 'LMSW'. All 6 therapist cards render (rich-maier, steph-maier, cristina-dunahoo, shari-almanza, anna-devries, sara-hill). End-to-end check-in flow with rich-maier works: tap card → confirm-modal opens → confirm-checkin-button → kiosk-success-screen → success-home-button returns to kiosk-home-screen. Screenshot visually confirms no practice text under Rich or Steph.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": ["/app/backend/tests/test_kiosk_api.py"],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "TherapistCard.jsx correctly guards the practice <span> with `{practice ? ... : null}` — empty string is falsy so no empty row/gap is rendered. Good.",
+    "Backend PRACTICES dict change to only map cristina-dunahoo and shari-almanza is the right, minimal fix. Consider adding a unit test in test_kiosk_api.py that asserts practice=='' for rich-maier and steph-maier and asserts the exact expected practice strings for the other two so this regression is caught next time.",
+    "Carry-over from earlier iterations: Anna DeVries card intentionally falls back to the AD monogram (no photo). Not a bug for this scope."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "not tested (frontend-only request)", "frontend": "100% (all 4 label assertions + 6-card count + full check-in flow passed)"},
+  "test_credentials": "N/A — no auth on kiosk. Rich Maier is the only slug with a live Resend email mapping; check-in POST succeeded and success screen rendered.",
+  "seed_data_creation": "None. Kiosk was left in its default order (admin saved-order empty) as noted in iteration_3.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Kiosk home '/' renders 6 cards. Rich Maier and Steph Maier now have practice='' from backend and TherapistCard hides the practice line when falsy. The other two practice labels ('The CENTER for Wellbeing', 'Almanza Therapy Solutions') are still present. Full happy-path check-in flow via rich-maier still works end-to-end. Backend regression suite lives at /app/backend/tests/test_kiosk_api.py (13 tests as of iteration_3); consider adding an explicit assertion on the practice field per slug there.",
+  "rca of the issue": "N/A — bug fix verified working. Root cause of the original bug was that PRACTICES in backend/server.py used to map rich-maier and steph-maier to 'Parkview Professional Counseling' (a retired label). Fix: remove those two keys so GET /api/therapists returns practice='' for them; frontend TherapistCard already guarded the render with a truthy check, so an empty string hides the label."
+}

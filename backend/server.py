@@ -55,8 +55,6 @@ PLACEHOLDER_SLUGS = ["anna-devries", "sara-hill"]
 # Practice / brand each therapist belongs to. Shown as a small line on their card.
 # Keyed by slug. Edit here to change or add a practice label.
 PRACTICES = {
-    "rich-maier": "Parkview Professional Counseling",
-    "steph-maier": "Parkview Professional Counseling",
     "cristina-dunahoo": "The CENTER for Wellbeing",
     "shari-almanza": "Almanza Therapy Solutions",
 }
