@@ -43,7 +43,6 @@ FROM_EMAIL = (os.environ.get("FROM_EMAIL") or os.environ.get("SENDER_EMAIL") or 
 EMAIL_SUBJECT = "Client has checked in at Parkview Counseling"
 
 # Fallback headshots for therapists whose site profile has no photo (photo: null).
-# Keyed by slug -> image path/URL (relative paths are resolved against the site).
 PHOTO_FALLBACKS = {
     "shari-almanza": "https://customer-assets.emergentagent.com/job_parkview-intake/artifacts/427fab16_IMG_2619.webp",
 }
@@ -58,6 +57,18 @@ PRACTICES = {
     "cristina-dunahoo": "The CENTER for Wellbeing",
     "shari-almanza": "Almanza Therapy Solutions",
 }
+
+# Therapists to include that are NOT in the scraped site data (added to the site
+# after its last React build, or sublets). Added only if not already scraped.
+MANUAL_THERAPISTS = [
+    {
+        "slug": "providence-amisi-klap",
+        "name": "Providence Amisi-Klap",
+        "credentials": "LLMSW",
+        "title": "Limited Licensed Master Social Worker",
+        "photo": "/images/team/providence-amisi-klap.jpg",
+    },
+]
 
 # ---------------------------------------------------------------------------
 # Logging (console + rotating file the practice can review later)
@@ -191,6 +202,20 @@ def _scrape_site() -> List[dict]:
                 "title": "",
                 "photo": photo if photo.startswith("http") else f"{SITE_BASE}{photo}",
             }
+
+    # Therapists not in the scraped bundle (added to the site after its last
+    # React build, or sublets). Added only if not already scraped.
+    for man in MANUAL_THERAPISTS:
+        if man["slug"] in found:
+            continue
+        mphoto = man["photo"]
+        found[man["slug"]] = {
+            "slug": man["slug"],
+            "name": man["name"],
+            "credentials": man.get("credentials", ""),
+            "title": man.get("title", ""),
+            "photo": mphoto if mphoto.startswith("http") else f"{SITE_BASE}{mphoto}",
+        }
 
     therapists = list(found.values())
     if not therapists:
