@@ -1,0 +1,26 @@
+{
+  "summary": "Independently verified the NEW admin reorder feature end-to-end. Backend pytest: 13/13 passed (roster of 6 slugs, no email leak, live/cache sources, placeholder-bottom fallback, checkin success+422, failure log, plus new /api/admin/order GET/PUT with saved-order-reflected-in-therapists, empty-order restores default, and partial-order appends unlisted). Frontend playwright: /admin renders with data-testid='admin-page' and 'admin-order-list' with all 6 rows (rich-maier, steph-maier, cristina-dunahoo, shari-almanza, anna-devries, sara-hill) in the default order; first row's up arrow and last row's down arrow are disabled; clicking admin-move-down-rich-maier moves Rich below Steph; Save button becomes enabled and clicking admin-save-order-button shows the 'Order saved. The kiosk will use this order on its next load or refresh.' sonner toast. Reload of /admin retains the reordered list (persistence confirmed). Navigating to '/' shows kiosk-home-screen with therapist cards in the SAME saved order. Kiosk has zero admin-move-up-*/admin-move-down-* elements and no draggable=true on any card. Tapping therapist-card-rich-maier opens confirm-modal (order unchanged), confirm-checkin-button transitions to kiosk-success-screen, and success-home-button returns to home. Order reset to empty at end of session; app left in default state.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [
+    "/app/backend/tests/test_kiosk_api.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "AdminOrder.jsx: the drag-and-drop path uses e.preventDefault() on dragover and moves the item while dragging (dragIndex.current = i after each move), but the <li> uses cursor-grab; there is no visual drop indicator or a11y announcement, and keyboard users cannot reorder — only the mouse-drag or the arrow buttons work. Not a bug for this scope, but consider aria-live announcements when moves happen.",
+    "GET/PUT /api/admin/order have no auth (public); acceptable per problem statement, but before production these operator endpoints should require a shared token or IP allow-list to prevent a client at the kiosk from opening /admin.",
+    "PUT /api/admin/order accepts arbitrary slug strings without validating against the actual roster; an operator (or a bad request) could persist slugs that don't exist. list_therapists() gracefully ignores them (sorts to end), so no crash, but the API could return 400 on unknown slugs for clarity.",
+    "list_therapists sort key uses `index.get(t['slug'], len(saved_order))` which yields a stable ordering, but two therapists absent from saved_order all tie on the sentinel value; correct because sorted() is stable, just worth documenting.",
+    "Small mismatch (carry-over from iter 2): the slug for 'Shari M. Almanza' is 'shari-almanza' (drops the middle initial). Not raised by this iteration's tests but noted in earlier review."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_kiosk_api.py (added 5 new admin/order + placeholder tests; adjusted therapist count from 3 -> 6; added session-scope teardown that resets order to empty)"
+  ],
+  "success_rate": {"backend": "100% (13/13)", "frontend": "100% (all 12 admin+kiosk assertions passed)"},
+  "seed_data_creation": "None. Tests use the existing 6 scraped therapists. Kiosk custom order was set during tests and reset to empty at the end so the app is in default state.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Backend pytest file /app/backend/tests/test_kiosk_api.py is now the canonical regression suite (13 tests, ~3s). A session-autouse fixture resets /api/admin/order to empty after the run so the app is left in default order (anna-devries + sara-hill pinned to the bottom). The admin reorder feature is fully wired: PUT /api/admin/order persists to Mongo collection kiosk_settings key 'therapist_order'; GET /api/therapists applies that order first and appends unlisted slugs after. Frontend /admin uses sonner toasts (top-center) — text 'Order saved' is what to assert. Rich Maier remains the only slug with a live email mapping.",
+  "rca of the issue": "N/A — no issues found. New feature works as specified: admin loads with 6 rows and correct data-testids, arrow reorder works (with boundary disable), Save persists and reloads correctly, kiosk reflects saved order, kiosk cannot be reordered (no controls, not draggable), and the existing rich-maier check-in flow still works end-to-end."
+}

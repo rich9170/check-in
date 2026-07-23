@@ -292,6 +292,30 @@ class CheckinRequest(BaseModel):
     slug: str
 
 
+class OrderRequest(BaseModel):
+    order: List[str]
+
+
+async def get_saved_order() -> List[str]:
+    doc = await db.kiosk_settings.find_one({"key": "therapist_order"})
+    return doc.get("order", []) if doc else []
+
+
+@api_router.get("/admin/order")
+async def get_order():
+    return {"order": await get_saved_order()}
+
+
+@api_router.put("/admin/order")
+async def put_order(req: OrderRequest):
+    await db.kiosk_settings.update_one(
+        {"key": "therapist_order"},
+        {"$set": {"order": req.order, "updated_at": datetime.now(timezone.utc).isoformat()}},
+        upsert=True,
+    )
+    return {"status": "ok", "order": req.order}
+
+
 @api_router.get("/")
 async def root():
     return {"message": "Parkview Counseling kiosk API"}
@@ -305,12 +329,25 @@ async def list_therapists(refresh: bool = False):
         # No data at all -> kiosk shows "initializing" message. Return 200 with an
         # empty list so the platform gateway doesn't replace a 5xx with its own page.
         return {"therapists": [], "source": "unavailable", "cached_at": 0, "code": "NO_DATA", "message": str(e)}
-    # Pin placeholder therapists to the bottom, keep others in scraped order.
     roster = result["therapists"]
-    ordered = (
-        [t for t in roster if t["slug"] not in PLACEHOLDER_SLUGS]
-        + [t for t in roster if t["slug"] in PLACEHOLDER_SLUGS]
-    )
+
+    # Ordering: a saved custom order (set by the operator in /admin) takes priority.
+    # Therapists not in the saved order are appended in scraped order. If no custom
+    # order exists yet, fall back to pinning placeholder therapists to the bottom.
+    saved_order = await get_saved_order()
+    if saved_order:
+        index = {slug: i for i, slug in enumerate(saved_order)}
+        ordered = sorted(
+            roster,
+            key=lambda t: (index.get(t["slug"], len(saved_order)),),
+        )
+        # keep scraped order among those not in saved_order (stable sort preserves it)
+    else:
+        ordered = (
+            [t for t in roster if t["slug"] not in PLACEHOLDER_SLUGS]
+            + [t for t in roster if t["slug"] in PLACEHOLDER_SLUGS]
+        )
+
     # Cache-buster tied to the last scrape time. The site reuses filenames when a
     # photo changes, so this forces browsers to re-download the latest image.
     version = int(result["cached_at"])
