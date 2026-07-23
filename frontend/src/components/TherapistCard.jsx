@@ -13,6 +13,8 @@ export function TherapistCard({ therapist, onSelect, index }) {
   const { slug, name, credentials, practice, photo } = therapist;
   const [imgError, setImgError] = useState(false);
   const isLogo = typeof photo === "string" && photo.includes("/images/practices/");
+  // Shrink the name font just enough for long names to stay on one line.
+  const nameSize = name.length > 17 ? "text-[1rem]" : "text-[1.3rem]";
   // Per-therapist framing tweaks (where the crop should focus). Default centers.
   const objectPosition = { "rich-maier": "center 18%", "cristina-dunahoo": "center 18%", "steph-maier": "center 34%", "shari-almanza": "center 10%" }[slug] || "center";
   return (
@@ -48,7 +50,7 @@ export function TherapistCard({ therapist, onSelect, index }) {
       </div>
       <div className="shrink-0 px-4 py-2.5">
         <div className="flex flex-wrap items-baseline gap-x-2">
-          <span className="font-serif text-[1.3rem] leading-none text-brand-ink">
+          <span className={`font-serif ${nameSize} leading-none text-brand-ink`}>
             {name}
           </span>
           {credentials ? (
