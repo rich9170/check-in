@@ -46,18 +46,20 @@ export function TherapistCard({ therapist, onSelect, index }) {
           />
         )}
       </div>
-      <div className="flex shrink-0 flex-col justify-center px-5 py-3">
-        <span className="font-serif text-[1.4rem] leading-tight text-brand-ink">
-          {name}
-        </span>
-        {practice ? (
-          <span className="mt-0.5 text-sm font-medium text-brand-muted">
-            {practice}
+      <div className="shrink-0 px-4 py-2.5">
+        <div className="flex flex-wrap items-baseline gap-x-2">
+          <span className="font-serif text-[1.3rem] leading-none text-brand-ink">
+            {name}
           </span>
-        ) : null}
-        {credentials ? (
-          <span className="mt-1 text-xs font-semibold uppercase tracking-wide text-brand-green">
-            {credentials}
+          {credentials ? (
+            <span className="text-sm font-medium text-brand-green">
+              {credentials}
+            </span>
+          ) : null}
+        </div>
+        {practice ? (
+          <span className="mt-1 block truncate text-xs font-medium text-brand-muted">
+            {practice}
           </span>
         ) : null}
       </div>
